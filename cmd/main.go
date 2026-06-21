@@ -1,5 +1,7 @@
 package main
 
+import "path/filepath"
+
 import (
 	"fmt"
 	"os"
@@ -43,7 +45,7 @@ func handleStatus() {
 
 	fmt.Println("✓ Git repository detected")
 	fmt.Printf("Today's Commits: %d\n", count)
-	
+
 }
 
 func handleRemind() {
@@ -83,4 +85,13 @@ func getTodaysCommitCount() (int, error) {
 	}
 
 	return len(lines), nil
+}
+
+func getRepoName() string {
+	return filepath.Base(getCurrentDir())
+}
+
+func getCurrentDir() string {
+	dir, _ := os.Getwd()
+	return dir
 }
