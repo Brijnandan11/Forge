@@ -5,8 +5,9 @@ import "path/filepath"
 import (
 	"fmt"
 	"os"
-	"os/exec"
-	"strings"
+	"github.com/gen2brain/beeep"
+	gitutils "github.com/brijnandan/gitstreak/internal/git"
+	"time"
 )
 
 func main() {
@@ -20,7 +21,9 @@ func main() {
 		handleStatus()
 	case "remind":
 		handleRemind()
-	case "help":
+	case "watch":
+	    handleWatch()
+	 case "help":
 		printHelp()
 	default:
 		fmt.Printf("Unknown command: %s\n", os.Args[1])
@@ -32,9 +35,9 @@ func handleStatus() {
 	wd, _ := os.Getwd()
     repo := filepath.Base(wd)
 
-    count, _ := getTodaysCommitCount()
-    branch, _ := getCurrentBranch()
-    lastCommit, _ := getLastCommitMessage()
+    count, _ := gitutils.GetTodaysCommitCount()
+    branch, _ := gitutils.GetCurrentBranch()
+    lastCommit, _ := gitutils.GetLastCommitMessage()
 
     fmt.Println("GitStreak")
     fmt.Println()
@@ -53,35 +56,61 @@ func handleStatus() {
 }
 
 func handleRemind() {
-	fmt.Println("Checking today's commits...")
+	count, err := gitutils.GetTodaysCommitCount()
+
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	if count == "0" {
+		err := sendReminder()
+
+		if err != nil {
+			fmt.Println("Failed to send notification:", err)
+			return
+		}
+
+		fmt.Println("Reminder sent")
+		return
+	}
+
+	fmt.Printf("Streak safe (%s commits today)\n", count)
+}
+
+func handleWatch() {
+	fmt.Println("Forge watcher started")
+
+	notified := false
+
+	for {
+		count, err := gitutils.GetTodaysCommitCount()
+
+		if err == nil {
+
+			if count == "0" && !notified {
+				sendReminder()
+				notified = true
+			}
+
+			if count != "0" {
+				notified = false
+			}
+		}
+
+		time.Sleep(10 * time.Second)
+	}
 }
 
 func printHelp() {
-	fmt.Println("GitStreak")
-	fmt.Println("")
+	fmt.Println("Forge")
+	fmt.Println()
 	fmt.Println("Usage:")
-	fmt.Println("  gitstreak status")
-	fmt.Println("  gitstreak remind")
-	fmt.Println("  gitstreak help")
+	fmt.Println("  forge status")
+	fmt.Println("  forge remind")
+	fmt.Println("  forge watch")
+	fmt.Println("  forge help")
 }
-
-func getTodaysCommitCount() (string, error) {
-	cmd := exec.Command(
-		"git",
-		"rev-list",
-		"--count",
-		"--since=midnight",
-		"HEAD",
-	)
-
-	output, err := cmd.Output()
-	if err != nil {
-		return "", err
-	}
-
-	return strings.TrimSpace(string(output)), nil
-}
-
 func getRepoName() string {
 	return filepath.Base(getCurrentDir())
 }
@@ -91,34 +120,10 @@ func getCurrentDir() string {
 	return dir
 }
 
-func getLastCommitMessage() (string, error) {
-	cmd := exec.Command(
-		"git",
-		"log",
-		"-1",
-		"--pretty=%s",
+func sendReminder() error {
+	return beeep.Notify(
+		"Forge",
+		"No commits today. Your streak is at risk.",
+		"",
 	)
-
-	output, err := cmd.Output()
-
-	if err != nil {
-		return "", err
-	}
-
-	return strings.TrimSpace(string(output)), nil
-}
-
-func getCurrentBranch() (string, error) {
-	cmd := exec.Command(
-		"git",
-		"branch",
-		"--show-current",
-	)
-
-	output, err := cmd.Output()
-	if err != nil {
-		return "", err
-	}
-
-	return strings.TrimSpace(string(output)), nil
 }
