@@ -25,7 +25,14 @@ func main() {
 }
 
 func handleStatus() {
-	fmt.Println("Checking repository...")
+	_, err := os.Stat(".git")
+
+	if err != nil {
+		fmt.Println("✗ Not a Git repository")
+		return
+	}
+
+	fmt.Println("✓ Git repository detected")
 }
 
 func handleRemind() {
