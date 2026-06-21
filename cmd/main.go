@@ -29,6 +29,9 @@ func main() {
 }
 
 func handleStatus() {
+	wd, _ := os.Getwd()
+    repo := filepath.Base(wd)
+	
 	_, err := os.Stat(".git")
 
 	if err != nil {
@@ -43,8 +46,12 @@ func handleStatus() {
 		return
 	}
 
-	fmt.Println("✓ Git repository detected")
-	fmt.Printf("Today's Commits: %d\n", count)
+	fmt.Println("GitStreak")
+    fmt.Println()
+
+    fmt.Printf("%-15s %s\n", "Repository", repo)
+    fmt.Printf("%-15s %s\n", "Commits Today", count)
+    fmt.Printf("%-15s %s\n", "Status", "SAFE")
 
 }
 
@@ -61,30 +68,21 @@ func printHelp() {
 	fmt.Println("  gitstreak help")
 }
 
-func getTodaysCommitCount() (int, error) {
+func getTodaysCommitCount() (string, error) {
 	cmd := exec.Command(
 		"git",
-		"log",
-		"--since=today",
-		"--oneline",
+		"rev-list",
+		"--count",
+		"--since=midnight",
+		"HEAD",
 	)
 
 	output, err := cmd.Output()
-
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
-	lines := strings.Split(
-		strings.TrimSpace(string(output)),
-		"\n",
-	)
-
-	if len(lines) == 1 && lines[0] == "" {
-		return 0, nil
-	}
-
-	return len(lines), nil
+	return strings.TrimSpace(string(output)), nil
 }
 
 func getRepoName() string {
@@ -94,4 +92,21 @@ func getRepoName() string {
 func getCurrentDir() string {
 	dir, _ := os.Getwd()
 	return dir
+}
+
+func getLastCommitMessage() (string, error) {
+	cmd := exec.Command(
+		"git",
+		"log",
+		"-1",
+		"--pretty=%s",
+	)
+
+	output, err := cmd.Output()
+
+	if err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(string(output)), nil
 }
