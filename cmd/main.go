@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
+	"strings"
 )
 
 func main() {
@@ -32,7 +34,16 @@ func handleStatus() {
 		return
 	}
 
+	count, err := getTodaysCommitCount()
+
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
 	fmt.Println("✓ Git repository detected")
+	fmt.Printf("Today's Commits: %d\n", count)
+	
 }
 
 func handleRemind() {
@@ -46,4 +57,30 @@ func printHelp() {
 	fmt.Println("  gitstreak status")
 	fmt.Println("  gitstreak remind")
 	fmt.Println("  gitstreak help")
+}
+
+func getTodaysCommitCount() (int, error) {
+	cmd := exec.Command(
+		"git",
+		"log",
+		"--since=today",
+		"--oneline",
+	)
+
+	output, err := cmd.Output()
+
+	if err != nil {
+		return 0, err
+	}
+
+	lines := strings.Split(
+		strings.TrimSpace(string(output)),
+		"\n",
+	)
+
+	if len(lines) == 1 && lines[0] == "" {
+		return 0, nil
+	}
+
+	return len(lines), nil
 }
