@@ -31,27 +31,24 @@ func main() {
 func handleStatus() {
 	wd, _ := os.Getwd()
     repo := filepath.Base(wd)
-	
-	_, err := os.Stat(".git")
 
-	if err != nil {
-		fmt.Println("✗ Not a Git repository")
-		return
-	}
+    count, _ := getTodaysCommitCount()
+    branch, _ := getCurrentBranch()
+    lastCommit, _ := getLastCommitMessage()
 
-	count, err := getTodaysCommitCount()
-
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
-
-	fmt.Println("GitStreak")
+    fmt.Println("GitStreak")
     fmt.Println()
 
     fmt.Printf("%-15s %s\n", "Repository", repo)
+    fmt.Printf("%-15s %s\n", "Branch", branch)
     fmt.Printf("%-15s %s\n", "Commits Today", count)
-    fmt.Printf("%-15s %s\n", "Status", "SAFE")
+    fmt.Printf("%-15s %s\n", "Last Commit", lastCommit)
+
+    if count == "0" {
+	   fmt.Printf("%-15s %s\n", "Status", "AT RISK")
+    } else {
+	    fmt.Printf("%-15s %s\n", "Status", "SAFE")
+   }
 
 }
 
@@ -104,6 +101,21 @@ func getLastCommitMessage() (string, error) {
 
 	output, err := cmd.Output()
 
+	if err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(string(output)), nil
+}
+
+func getCurrentBranch() (string, error) {
+	cmd := exec.Command(
+		"git",
+		"branch",
+		"--show-current",
+	)
+
+	output, err := cmd.Output()
 	if err != nil {
 		return "", err
 	}
