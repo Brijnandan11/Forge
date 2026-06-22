@@ -111,6 +111,12 @@ func AddRepository(path string) error {
 		return err
 	}
 
+	for _, repo := range cfg.Repositories {
+		if repo == path {
+			return nil
+		}
+	}
+
 	cfg.Repositories = append(
 		cfg.Repositories,
 		path,

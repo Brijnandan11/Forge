@@ -53,3 +53,23 @@ func GetLastCommitMessage() (string, error) {
 
 	return strings.TrimSpace(string(output)), nil
 }
+
+func GetTodaysCommitCountForRepo(repoPath string) (string, error) {
+	cmd := exec.Command(
+		"git",
+		"rev-list",
+		"--count",
+		"--since=midnight",
+		"HEAD",
+	)
+
+	cmd.Dir = repoPath
+
+	output, err := cmd.Output()
+
+	if err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(string(output)), nil
+}

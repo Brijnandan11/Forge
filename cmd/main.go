@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/gen2brain/beeep"
@@ -11,6 +10,8 @@ import (
 	configpkg "github.com/brijnandan/gitstreak/internal/config"
 
 	gitutils "github.com/brijnandan/gitstreak/internal/git"
+
+	"strconv"
 )
 
 const Version = "0.1.0"
@@ -44,27 +45,38 @@ func main() {
 }
 
 func handleStatus() {
-	wd, _ := os.Getwd()
-    repo := filepath.Base(wd)
+	cfg, err := configpkg.LoadConfig()
 
-    count, _ := gitutils.GetTodaysCommitCount()
-    branch, _ := gitutils.GetCurrentBranch()
-    lastCommit, _ := gitutils.GetLastCommitMessage()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
 
-    fmt.Println("Forge")
-    fmt.Println()
+	totalCommits := 0
 
-    fmt.Printf("%-15s %s\n", "Repository", repo)
-    fmt.Printf("%-15s %s\n", "Branch", branch)
-    fmt.Printf("%-15s %s\n", "Commits Today", count)
-    fmt.Printf("%-15s %s\n", "Last Commit", lastCommit)
+	for _, repo := range cfg.Repositories {
+		countStr, err := gitutils.GetTodaysCommitCountForRepo(repo)
 
-    if count == "0" {
-	   fmt.Printf("%-15s %s\n", "Status", "AT RISK")
-    } else {
-	    fmt.Printf("%-15s %s\n", "Status", "SAFE")
-   }
+		if err != nil {
+			continue
+		}
 
+		count, _ := strconv.Atoi(countStr)
+		totalCommits += count
+	}
+
+	status := "AT RISK"
+
+	if totalCommits > 0 {
+		status = "SAFE"
+	}
+
+	fmt.Println("Forge")
+	fmt.Println()
+
+	fmt.Printf("%-22s %d\n", "Tracked Repositories", len(cfg.Repositories))
+	fmt.Printf("%-22s %d\n", "Commits Today", totalCommits)
+	fmt.Printf("%-22s %s\n", "Status", status)
 }
 
 func handleRemind() {
@@ -184,3 +196,4 @@ func handleList() {
 		fmt.Printf("%d. %s\n", i+1, repo)
 	}
 }
+
