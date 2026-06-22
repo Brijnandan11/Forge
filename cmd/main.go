@@ -1,16 +1,24 @@
 package main
 
-import "path/filepath"
-
 import (
 	"fmt"
 	"os"
-	"github.com/gen2brain/beeep"
-	gitutils "github.com/brijnandan/gitstreak/internal/git"
+	"path/filepath"
 	"time"
+
+	"github.com/gen2brain/beeep"
+
+	configpkg "github.com/brijnandan/gitstreak/internal/config"
+	gitutils "github.com/brijnandan/gitstreak/internal/git"
 )
 
+const Version = "0.1.0"
+
 func main() {
+
+	configpkg.EnsureConfigDir()
+     configpkg.CreateDefaultConfig()
+	 
 	if len(os.Args) < 2 {
 		printHelp()
 		return
@@ -23,8 +31,10 @@ func main() {
 		handleRemind()
 	case "watch":
 	    handleWatch()
-	 case "help":
+	case "help":
 		printHelp()
+	case "version":
+	    handleVersion()
 	default:
 		fmt.Printf("Unknown command: %s\n", os.Args[1])
 		printHelp()
@@ -39,7 +49,7 @@ func handleStatus() {
     branch, _ := gitutils.GetCurrentBranch()
     lastCommit, _ := gitutils.GetLastCommitMessage()
 
-    fmt.Println("GitStreak")
+    fmt.Println("Forge")
     fmt.Println()
 
     fmt.Printf("%-15s %s\n", "Repository", repo)
@@ -110,14 +120,7 @@ func printHelp() {
 	fmt.Println("  forge remind")
 	fmt.Println("  forge watch")
 	fmt.Println("  forge help")
-}
-func getRepoName() string {
-	return filepath.Base(getCurrentDir())
-}
-
-func getCurrentDir() string {
-	dir, _ := os.Getwd()
-	return dir
+	fmt.Println("  forge version")
 }
 
 func sendReminder() error {
@@ -126,4 +129,8 @@ func sendReminder() error {
 		"No commits today. Your streak is at risk.",
 		"",
 	)
+}
+
+func handleVersion() {
+	fmt.Printf("Forge %s\n", Version)
 }
