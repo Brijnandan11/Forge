@@ -9,6 +9,7 @@ import (
 	"github.com/gen2brain/beeep"
 
 	configpkg "github.com/brijnandan/gitstreak/internal/config"
+
 	gitutils "github.com/brijnandan/gitstreak/internal/git"
 )
 
@@ -16,9 +17,6 @@ const Version = "0.1.0"
 
 func main() {
 
-	configpkg.EnsureConfigDir()
-     configpkg.CreateDefaultConfig()
-	 
 	if len(os.Args) < 2 {
 		printHelp()
 		return
@@ -26,15 +24,19 @@ func main() {
 
 	switch os.Args[1] {
 	case "status":
-		handleStatus()
-	case "remind":
-		handleRemind()
-	case "watch":
-	    handleWatch()
-	case "help":
-		printHelp()
-	case "version":
-	    handleVersion()
+	  handleStatus()
+    case "remind":
+	  handleRemind()
+    case "watch":
+	  handleWatch()
+    case "version":
+	  handleVersion()
+    case "add":
+	  handleAdd()
+    case "help":
+	  printHelp()
+	case "list":
+	  handleList()
 	default:
 		fmt.Printf("Unknown command: %s\n", os.Args[1])
 		printHelp()
@@ -121,6 +123,7 @@ func printHelp() {
 	fmt.Println("  forge watch")
 	fmt.Println("  forge help")
 	fmt.Println("  forge version")
+	fmt.Println("  forge list")
 }
 
 func sendReminder() error {
@@ -133,4 +136,51 @@ func sendReminder() error {
 
 func handleVersion() {
 	fmt.Printf("Forge %s\n", Version)
+}
+
+func handleAdd() {
+	err := configpkg.EnsureConfigDir()
+
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	path, err := os.Getwd()
+
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	err = configpkg.AddRepository(path)
+
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	fmt.Println("Repository added:")
+	fmt.Println(path)
+}
+
+func handleList() {
+	cfg, err := configpkg.LoadConfig()
+
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	if len(cfg.Repositories) == 0 {
+		fmt.Println("No repositories configured")
+		return
+	}
+
+	fmt.Println("Tracked Repositories")
+	fmt.Println()
+
+	for i, repo := range cfg.Repositories {
+		fmt.Printf("%d. %s\n", i+1, repo)
+	}
 }

@@ -59,3 +59,62 @@ func CreateDefaultConfig() error {
 
 	return json.NewEncoder(file).Encode(cfg)
 }
+
+func LoadConfig() (*Config, error) {
+	path, err := GetConfigPath()
+
+	if err != nil {
+		return nil, err
+	}
+
+	file, err := os.Open(path)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer file.Close()
+
+	var cfg Config
+
+	err = json.NewDecoder(file).Decode(&cfg)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &cfg, nil
+}
+
+func SaveConfig(cfg *Config) error {
+	path, err := GetConfigPath()
+
+	if err != nil {
+		return err
+	}
+
+	file, err := os.Create(path)
+
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	return json.NewEncoder(file).Encode(cfg)
+}
+
+func AddRepository(path string) error {
+	cfg, err := LoadConfig()
+
+	if err != nil {
+		return err
+	}
+
+	cfg.Repositories = append(
+		cfg.Repositories,
+		path,
+	)
+
+	return SaveConfig(cfg)
+}
