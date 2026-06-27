@@ -124,3 +124,23 @@ func AddRepository(path string) error {
 
 	return SaveConfig(cfg)
 }
+
+func RemoveRepository(path string) error {
+	cfg, err := LoadConfig()
+
+	if err != nil {
+		return err
+	}
+
+	var repositories []string
+
+	for _, repo := range cfg.Repositories {
+		if repo != path {
+			repositories = append(repositories, repo)
+		}
+	}
+
+	cfg.Repositories = repositories
+
+	return SaveConfig(cfg)
+}
