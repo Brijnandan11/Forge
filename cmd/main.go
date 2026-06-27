@@ -12,6 +12,7 @@ import (
 	gitutils "github.com/brijnandan/gitstreak/internal/git"
 
 	"strconv"
+	"os/exec"
 )
 
 const Version = "0.1.0"
@@ -40,6 +41,8 @@ func main() {
 	  handleRemove()
 	case "list":
 	  handleList()
+	case "doctor":
+	  handleDoctor()
 	default:
 		fmt.Printf("Unknown command: %s\n", os.Args[1])
 		printHelp()
@@ -139,6 +142,7 @@ func printHelp() {
 	fmt.Println("  forge version")
 	fmt.Println("  forge remove")
 	fmt.Println("  forge list")
+	fmt.Println("  forge doctor")
 }
 
 func sendReminder() error {
@@ -216,6 +220,37 @@ func handleList() {
 
 	for i, repo := range cfg.Repositories {
 		fmt.Printf("%d. %s\n", i+1, repo)
+	}
+}
+
+func handleDoctor() {
+	fmt.Println("Forge Doctor")
+	fmt.Println()
+
+	path, err := configpkg.GetConfigPath()
+
+	if err == nil {
+		if _, err := os.Stat(path); err == nil {
+			fmt.Println("✓ Config file found")
+		} else {
+			fmt.Println("✗ Config file missing")
+		}
+	}
+
+	_, err = exec.LookPath("git")
+
+	if err == nil {
+		fmt.Println("✓ Git installed")
+	} else {
+		fmt.Println("✗ Git not installed")
+	}
+
+	cfg, err := configpkg.LoadConfig()
+
+	if err == nil {
+		fmt.Printf("✓ %d repositories configured\n", len(cfg.Repositories))
+	} else {
+		fmt.Println("✗ Unable to load configuration")
 	}
 }
 

@@ -106,7 +106,6 @@ func SaveConfig(cfg *Config) error {
 
 func AddRepository(path string) error {
 	cfg, err := LoadConfig()
-
 	if err != nil {
 		return err
 	}
@@ -117,10 +116,7 @@ func AddRepository(path string) error {
 		}
 	}
 
-	cfg.Repositories = append(
-		cfg.Repositories,
-		path,
-	)
+	cfg.Repositories = append(cfg.Repositories, path)
 
 	return SaveConfig(cfg)
 }
