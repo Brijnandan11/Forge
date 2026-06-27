@@ -36,6 +36,8 @@ func main() {
 	  handleAdd()
     case "help":
 	  printHelp()
+	case "remove":
+	  handleRemove()
 	case "list":
 	  handleList()
 	default:
