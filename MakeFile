@@ -1,0 +1,14 @@
+build:
+	go build -o forge ./cmd
+
+install:
+	sudo cp forge /usr/local/bin/
+
+run:
+	go run ./cmd
+
+fmt:
+	go fmt ./...
+
+lint:
+	go vet ./...
