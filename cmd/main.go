@@ -137,6 +137,7 @@ func printHelp() {
 	fmt.Println("  forge watch")
 	fmt.Println("  forge help")
 	fmt.Println("  forge version")
+	fmt.Println("  forge remove")
 	fmt.Println("  forge list")
 }
 
@@ -175,6 +176,25 @@ func handleAdd() {
 	}
 
 	fmt.Println("Repository added:")
+	fmt.Println(path)
+}
+
+func handleRemove() {
+	path, err := os.Getwd()
+
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	err = configpkg.RemoveRepository(path)
+
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	fmt.Println("Repository removed:")
 	fmt.Println(path)
 }
 
