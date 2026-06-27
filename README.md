@@ -1,10 +1,21 @@
+<div align="center">
+
 # Forge
 
-[![Go](https://img.shields.io/badge/Go-00ADD8?style=flat&logo=go&logoColor=white)](https://golang.org)
-[![Git](https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white)](https://git-scm.com)
-[![systemd](https://img.shields.io/badge/systemd-000000?style=flat&logo=linux&logoColor=white)](https://systemd.io)
-[![JSON](https://img.shields.io/badge/JSON-000000?style=flat&logo=json&logoColor=white)](https://www.json.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat)](LICENSE)
+**Cross-Platform Git Activity Tracker & Streak Monitor**
+
+[![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://golang.org)
+[![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)](https://git-scm.com)
+[![systemd](https://img.shields.io/badge/systemd-000000?style=for-the-badge&logo=linux&logoColor=white)](https://systemd.io)
+[![Beeep](https://img.shields.io/badge/Beeep-6f42c1?style=for-the-badge&logo=go&logoColor=white)](https://github.com/gen2brain/beeep)
+[![JSON](https://img.shields.io/badge/JSON-000000?style=for-the-badge&logo=json&logoColor=white)](https://www.json.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+
+*Multi-Repo Tracking · Daily Streak Monitoring · Desktop Notifications · Background Watch Mode · CLI Diagnostics*
+
+</div>
+
+---
 
 A lightweight cross-platform Git activity tracker that helps developers maintain their daily coding streak through repository tracking, reminders, and background monitoring.
 
